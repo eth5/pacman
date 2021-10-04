@@ -17,15 +17,16 @@ import test.server.handlers.InitialGameDataMessageHandler;
 import test.server.handlers.StateMessageHandler;
 import test.server.messages.InitialGameDataMessage;
 
-public class Server{
+public class Server {
     final EventLoopGroup workerGroup = new NioEventLoopGroup();
     private final String host;
     private final int port;
 
-    public Server(String host, int port){
+    public Server(String host, int port) {
         this.host = host;
         this.port = port;
     }
+
     private Thread serverThread;
     private boolean isRun;
 
@@ -35,33 +36,34 @@ public class Server{
             final Action onDisconnect,
             final Action.Arg2<ChannelHandlerContext, InitialGameDataMessage> onInitialGameDataReceived,
             final Action.Arg1<test.server.messages.State> onStateReceived
-    ){
+    ) {
         if (isRun) throw new IllegalStateException("сервер уже запущен!");
         isRun = true;
         serverThread = new Thread(() -> {
             final ISerializer serializer = new GSonSerializer();
             try {
-                Bootstrap b = new Bootstrap();
-                b.group(workerGroup);
-                b.channel(NioSocketChannel.class);
-                b.option(ChannelOption.SO_KEEPALIVE, true);
-                b.handler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    public void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(
-                                new MessagesDecoder(serializer),
-                                new ClientMessageEncoder(),
-                                new InitialGameDataMessageHandler(onInitialGameDataReceived),
-                                new StateMessageHandler(onStateReceived),
-                                new ClientConnectionHandler(
-                                        onConnect,
-                                        onDisconnect
-                                )
-                        );
-                    }
-                });
+                Bootstrap bootstrap = new Bootstrap()
+                        .group(workerGroup)
+                        .channel(NioSocketChannel.class)
+                        .option(ChannelOption.SO_KEEPALIVE, true)
+                        .handler(new ChannelInitializer<SocketChannel>() {
+                            @Override
+                            public void initChannel(SocketChannel ch) throws Exception {
+                                ch.pipeline().addLast(
+                                        new MessagesDecoder(serializer),
+                                        new ClientMessageEncoder(),
+                                        new InitialGameDataMessageHandler(onInitialGameDataReceived),
+                                        new StateMessageHandler(onStateReceived),
+                                        new ClientConnectionHandler(
+                                                onConnect,
+                                                onDisconnect
+                                        )
+                                );
+                            }
+                        });
+
                 Log.i("Try connect to " + host + ":" + port);
-                ChannelFuture f = b.connect(host, port).sync();
+                ChannelFuture f = bootstrap.connect(host, port).sync();
 
                 f.channel().closeFuture().sync();
                 Log.i("Close connect");
@@ -72,14 +74,14 @@ public class Server{
 
             } finally {
                 workerGroup.shutdownGracefully();
-                Log.e(this,"end :(");
+                Log.e(this, "end :(");
             }
         });
         serverThread.start();
         return this;
     }
 
-    public void dispose(){
+    public void dispose() {
         workerGroup.shutdownGracefully();
     }
 }

@@ -29,6 +29,12 @@ public class Main extends ApplicationAdapter {
     private Game game;
     private final Queue<State> states = new Queue<>(5);
     private Server server;
+    private final String host;
+    private final int port;
+    public Main(String host, int port){
+        this.host = host;
+        this.port = port;
+    }
 
     @Override
     public void create() {
@@ -58,7 +64,7 @@ public class Main extends ApplicationAdapter {
                             ;
                         });
 
-        server = new Server("127.0.0.1", 8080).connect(
+        server = new Server(host, port).connect(
                 ctx->{
                     Log.i(this, "Connected!");
                     // и всё :)
