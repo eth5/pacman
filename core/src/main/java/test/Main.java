@@ -87,7 +87,7 @@ public class Main extends ApplicationAdapter {
                         game = new Game(ecsWorldBuilder,states);
                         int playeId = game.createEntityForLocalPlayer();
                         remoteToLocalEntities.put(initialGD.remotePlayerId, playeId);
-                        game.onConnecting(playeId,new Connection(ctx));
+                        game.onConnecting(playeId,new Connection(ctx.channel()));
 
                         screen = game;
                     });
