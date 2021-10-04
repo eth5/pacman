@@ -1,7 +1,6 @@
 package test;
 
 import com.badlogic.gdx.ApplicationAdapter;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -37,7 +36,7 @@ public class Main extends ApplicationAdapter {
         batch = new SpriteBatch();
         assets = getAssets();
 
-        //экран-заглушка пока не подключились к серверу
+        // экран-заглушка пока не подключились к серверу
         screen = new ConnectingScreen(viewport,batch);
     }
 
@@ -48,7 +47,7 @@ public class Main extends ApplicationAdapter {
         final IntMap<Integer> remoteToLocalEntities = new IntMap<>();
 
         final EcsWorldBuilder ecsWorldBuilder = new EcsWorldBuilder()
-                //ижектим нужные базовые зависимости
+                // ижектим нужные базовые зависимости
                 .dependencyInjection(
                         worldConfiguration -> {
                             worldConfiguration
@@ -62,7 +61,7 @@ public class Main extends ApplicationAdapter {
         server = new Server("127.0.0.1", 8080).connect(
                 ctx->{
                     Log.i(this, "Connected!");
-                    //и всё :)
+                    // и всё :)
                 },
                 ()->{
                     Log.i("Disconnected...");
