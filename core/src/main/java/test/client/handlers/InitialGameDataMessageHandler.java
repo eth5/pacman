@@ -1,9 +1,9 @@
-package test.server.handlers;
+package test.client.handlers;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import test.client.messages.InitialGameDataMessage;
 import test.interfaces.Action;
-import test.server.messages.InitialGameDataMessage;
 
 
 public class InitialGameDataMessageHandler extends SimpleChannelInboundHandler<InitialGameDataMessage> {

@@ -1,13 +1,13 @@
-package test.server.decode;
+package test.client.decode;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import test.client.messages.InitialGameDataMessage;
+import test.client.messages.MessageType;
+import test.client.messages.ServerCommand;
+import test.client.messages.State;
 import test.serialization.ISerializer;
-import test.server.messages.InitialGameDataMessage;
-import test.server.messages.MessageType;
-import test.server.messages.ServerCommand;
-import test.server.messages.State;
 
 import java.nio.charset.Charset;
 import java.util.List;

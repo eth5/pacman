@@ -1,7 +1,7 @@
 package test.game.ecs.components.events;
 
 import com.artemis.PooledComponent;
-import test.server.messages.State;
+import test.client.messages.State;
 
 /**
  * Компонент-событие запускает систему обновления состояния у сущностей

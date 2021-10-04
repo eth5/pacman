@@ -1,10 +1,9 @@
-package test.server.handlers;
+package test.client.handlers;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import test.client.messages.State;
 import test.interfaces.Action;
-import test.server.messages.ServerCommand;
-import test.server.messages.State;
 
 
 public class StateMessageHandler extends SimpleChannelInboundHandler<State> {

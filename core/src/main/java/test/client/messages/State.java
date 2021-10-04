@@ -1,4 +1,4 @@
-package test.server.messages;
+package test.client.messages;
 
 import com.google.gson.annotations.Expose;
 import io.netty.util.Recycler;
@@ -11,7 +11,7 @@ import java.util.List;
  * нужно оптимизировать для GC!
  */
 
-public class State {
+public class State implements IRecycler{
     private static final Recycler<State> RECYCLER = new Recycler<State>() {
         @Override
         protected State newObject(Handle<State> handle) {
@@ -25,6 +25,7 @@ public class State {
     private State(Recycler.Handle<State> handler){
         this.handler = handler;
     }
+    @Override
     public void recycle(){
         for (StateEntityData entity : entities) {
             entity.recycle();

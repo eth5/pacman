@@ -1,11 +1,11 @@
-package test.server.messages;
+package test.client.messages;
 import io.netty.util.Recycler;
 
 /**
  * Сообщения от клиента сервуру. Содержит нажатые клавиши
  */
 
-public class ClientMessage {
+public class ClientMessage implements IRecycler{
     private static final Recycler<ClientMessage> RECYCLER = new Recycler<ClientMessage>() {
         @Override
         protected ClientMessage newObject(Handle<ClientMessage> handle) {
@@ -24,7 +24,9 @@ public class ClientMessage {
         this.handle = handle;
     }
 
+    @Override
     public void recycle() {
+        size = 0;
         handle.recycle(this);
     }
 }
