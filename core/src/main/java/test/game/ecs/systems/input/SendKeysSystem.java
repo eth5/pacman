@@ -29,7 +29,9 @@ public class SendKeysSystem extends IteratingSystem {
                 .addSubscriptionListener( new EntitySubscription.SubscriptionListener() {
                     @Override
                     public void inserted( IntBag entities ) {
-                        if (playerId != -1 || entities.size() > 1) throw new IllegalStateException("Client может быть только 1 экземпляр!");
+                        if (playerId != -1 || entities.size() > 1){
+                            throw new IllegalStateException("Client может быть только 1 экземпляр!");
+                        }
                         playerId = entities.get(0);
                         client = world.getMapper(Client.class).get(playerId);
                     }
