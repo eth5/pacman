@@ -6,14 +6,13 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import test.assets.Assets;
 import test.client.GameClient;
 import test.client.messages.State;
-import test.game.Connection;
+import test.game.GameWrapper;
 import test.game.ecs.EcsWorldBuilder;
 import test.game.ecs.Game;
 import test.log.Log;
@@ -26,7 +25,7 @@ public class Main extends ApplicationAdapter {
     private Assets assets;
     private Viewport viewport;
     private SpriteBatch batch;
-    private Game game;
+    private GameWrapper gameWrapper;
     private final Queue<State> states = new Queue<>(5);
     private GameClient gameClient;
     private final String host;
@@ -44,15 +43,12 @@ public class Main extends ApplicationAdapter {
 
         // экран-заглушка пока не подключились к серверу
         screen = new ConnectingScreen(viewport,batch);
+        gameWrapper = new GameWrapper(new Game(states));
     }
 
-    private void onAssetsLoaded(){
+    private EcsWorldBuilder getEcsWorldBuilder(){
 
-        // карта соотвествий удаленных(remote) id сущностей - локальным
-        // для инекции зависимостей в системы
-        final IntMap<Integer> remoteToLocalEntities = new IntMap<>();
-
-        final EcsWorldBuilder ecsWorldBuilder = new EcsWorldBuilder()
+        return new EcsWorldBuilder()
                 // ижектим нужные базовые зависимости
                 .dependencyInjection(
                         worldConfiguration -> {
@@ -60,36 +56,30 @@ public class Main extends ApplicationAdapter {
                                     .register("batch", batch)
                                     .register("viewport",viewport)
                                     .register("assets", assets)
-                                    .register("remoteToLocalEntities",remoteToLocalEntities)
                             ;
                         });
+    }
 
+    private void onAssetsLoaded(){
         gameClient = new GameClient(host, port).connect(
-                ctx->{
-                    Log.i(this, "Connected!");
-                    // и всё :)
-                },
-                ()->{
-                    Log.i("Disconnected...");
-                    if (screen instanceof Game)((Game) screen).onDisconnection();
-                },
+                ctx-> gameWrapper.onConnecting(ctx.channel()),
+                gameWrapper::onDisconnected,
                 (ctx,initialGD)->{
+                    states.clear();
+                    gameWrapper.clearGame();
+
                     // вызывается при подключении к серверу,
                     // теперь в главном потоке инжектим нужные зависимости и запускаем игру
                     Gdx.app.postRunnable(()->{
-                        ecsWorldBuilder.dependencyInjection( worldConfiguration->{
+                        EcsWorldBuilder ecsWorldBuilder = getEcsWorldBuilder().dependencyInjection(worldConfiguration -> {
                             worldConfiguration
                                     .register("remotePlayerId", initialGD.remotePlayerId)
-                                    .register("field_width", initialGD.width * BLOCK_SIZE)
-                                    .register("field_height", initialGD.height * BLOCK_SIZE);
+                                    .register("field_width", initialGD.columns * BLOCK_SIZE)
+                                    .register("field_height", initialGD.rows * BLOCK_SIZE);
                         });
 
-                        game = new Game(ecsWorldBuilder,states);
-                        int playeId = game.createEntityForLocalPlayer();
-                        remoteToLocalEntities.put(initialGD.remotePlayerId, playeId);
-                        game.onConnecting(playeId,new Connection(ctx.channel()));
-
-                        screen = game;
+                        gameWrapper.startGame(ecsWorldBuilder, initialGD.remotePlayerId);
+                        screen = gameWrapper.screen;
                     });
                 },
                 // помещаем обновления стейта в очередь

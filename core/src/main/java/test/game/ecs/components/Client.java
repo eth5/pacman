@@ -12,7 +12,6 @@ public class Client extends PooledComponent {
 
     @Override
     protected void reset() {
-        if (connection!=null) connection.close();
         connection = null;
     }
 }

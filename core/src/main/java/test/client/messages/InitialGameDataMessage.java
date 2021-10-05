@@ -10,9 +10,9 @@ import com.google.gson.annotations.Expose;
 
 public class InitialGameDataMessage {
     @Expose
-    public int width;
+    public int rows;
     @Expose
-    public int height;
+    public int columns;
     @Expose
     public int remotePlayerId;
 }

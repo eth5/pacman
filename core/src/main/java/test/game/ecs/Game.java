@@ -1,6 +1,7 @@
 package test.game.ecs;
 
 import com.artemis.World;
+import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Queue;
 import test.client.messages.State;
 import test.game.Connection;
@@ -9,7 +10,6 @@ import test.game.ecs.components.Client;
 import test.game.ecs.components.Player;
 import test.game.ecs.components.events.InitialEvent;
 import test.game.ecs.util.Events;
-import test.log.Log;
 import test.presentation.IScreen;
 
 /**
@@ -17,44 +17,41 @@ import test.presentation.IScreen;
  */
 
 public class Game implements IScreen {
+    // карта соотвествий удаленных(remote) id сущностей - локальным
+    // для инекции зависимостей в системы
+    private final IntMap<Integer> remoteToLocalEntities = new IntMap<>();
 
-    private final World world;
-    private int connectionEntityId = -1;
+    private boolean isReady = false;
+    private World world;
     private final Queue<State> states;
 
-    public Game(EcsWorldBuilder ecsWorldBuilder, Queue<State> states){
-        world = ecsWorldBuilder.build();
+    public Game(Queue<State> states) {
         this.states = states;
     }
 
+    public void setWorld(EcsWorldBuilder ecsWorldBuilder){
+        ecsWorldBuilder.dependencyInjection(worldConfiguration->{
+            worldConfiguration.register("remoteToLocalEntities",remoteToLocalEntities);
+        });
+        this.world = ecsWorldBuilder.build();
+        isReady = true;
+    }
 
-    // не самое лучшее решение для получения локального id сущности локального игрока
-    // можно было просто зарезервировать первую сущность(id = 0) под локального игрока
-    public int createEntityForLocalPlayer(){
+    public void createEntityForLocalPlayer(int remotePlayerId, Connection connection){
 
         int localPlayerId = world.create();
+        remoteToLocalEntities.put(remotePlayerId, localPlayerId);
+
         world.getMapper(CameraTarget.class).create(localPlayerId);
         world.getMapper(Player.class).create(localPlayerId);
         world.getMapper(InitialEvent.class).create(localPlayerId);
-        return localPlayerId;
-    }
-
-    // добавляем соединение к сущности локального игрока
-    public void onConnecting(int playerId, Connection connection){
-        connectionEntityId = playerId;
-        Client client = world.getMapper(Client.class).create(playerId);
-        client.connection = connection;
-        Log.i(this, "Connected!");
-    }
-
-    // удаляем сущность локального игрока при закрытии соединения
-    public void onDisconnection(){
-        world.delete(connectionEntityId);
-        connectionEntityId = -1;
+        world.getMapper(Client.class).create(localPlayerId).connection = connection;
     }
 
     @Override
     public void update(float dt) {
+        if (!isReady)return;
+
         if (!states.isEmpty()){
             // т.к. сервер и игра работают в разных потоках возможен пропуск обноления состяния
             // в данном случае каждое обновление состояние обноляется в разных тиках в нужной последовтельности
@@ -66,7 +63,9 @@ public class Game implements IScreen {
 
     @Override
     public void dispose() {
-        world.dispose();
+        isReady = false;
+        if (world!=null) world.dispose();
+        remoteToLocalEntities.clear();
     }
 
 }
