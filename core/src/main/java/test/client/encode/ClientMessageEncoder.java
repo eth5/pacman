@@ -1,10 +1,10 @@
-package test.server.encode;
+package test.client.encode;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+import test.client.messages.ClientMessage;
 import test.log.Log;
-import test.server.messages.ClientMessage;
 
 public class ClientMessageEncoder extends MessageToByteEncoder<ClientMessage> {
     @Override

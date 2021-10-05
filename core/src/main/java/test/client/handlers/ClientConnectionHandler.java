@@ -1,4 +1,4 @@
-package test.server.handlers;
+package test.client.handlers;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;

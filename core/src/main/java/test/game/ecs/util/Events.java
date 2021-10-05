@@ -2,12 +2,12 @@ package test.game.ecs.util;
 
 import com.artemis.ComponentMapper;
 import com.artemis.World;
+import test.client.messages.State;
 import test.game.ecs.components.animation.AnimationData;
 import test.game.ecs.components.animation.AnimationEvent;
 import test.game.ecs.components.animation.Animations;
 import test.game.ecs.components.events.UpdateStateEvent;
 import test.log.Log;
-import test.server.messages.State;
 
 public class Events {
     private Events(){}

@@ -2,6 +2,7 @@ package test.game.ecs;
 
 import com.artemis.World;
 import com.badlogic.gdx.utils.Queue;
+import test.client.messages.State;
 import test.game.Connection;
 import test.game.ecs.components.CameraTarget;
 import test.game.ecs.components.Client;
@@ -10,7 +11,6 @@ import test.game.ecs.components.events.InitialEvent;
 import test.game.ecs.util.Events;
 import test.log.Log;
 import test.presentation.IScreen;
-import test.server.messages.State;
 
 /**
  * Слой обертка для связи сервера и ecs world

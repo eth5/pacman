@@ -4,11 +4,11 @@ import com.artemis.Component;
 import com.artemis.ComponentMapper;
 import com.artemis.World;
 import com.badlogic.gdx.utils.IntMap;
-import test.game.ecs.components.*;
+import test.client.messages.State;
+import test.client.messages.StateEntityData;
+import test.game.ecs.components.IUpdate;
 import test.game.ecs.components.events.InitialEvent;
 import test.log.Log;
-import test.server.messages.StateEntityData;
-import test.server.messages.State;
 
 /**
  * Имплементация синхронизации стетйта удаленных(remote) и локальных сущностей

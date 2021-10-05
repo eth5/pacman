@@ -1,4 +1,4 @@
-package test.server.messages;
+package test.client.messages;
 
 import com.artemis.Component;
 import com.artemis.utils.Bag;
@@ -13,7 +13,7 @@ import java.util.List;
  * нужно оптимизировать для GC!
  */
 
-public class StateEntityData {
+public class StateEntityData implements IRecycler {
     private static final Recycler<StateEntityData> RECYCLER = new Recycler<StateEntityData>() {
         @Override
         protected StateEntityData newObject(Handle<StateEntityData> handle) {
@@ -48,6 +48,7 @@ public class StateEntityData {
         this.handle = handle;
     }
 
+    @Override
     public void recycle(){
         components.clear();
         entityId = -1;

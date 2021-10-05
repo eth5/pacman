@@ -6,11 +6,11 @@ import com.artemis.EntitySubscription;
 import com.artemis.annotations.One;
 import com.artemis.systems.IteratingSystem;
 import com.artemis.utils.IntBag;
+import test.client.messages.ClientMessage;
 import test.game.ecs.components.Client;
 import test.game.ecs.components.Player;
 import test.game.ecs.components.events.UserPressKeysEvent;
 import test.log.Log;
-import test.server.messages.ClientMessage;
 
 /**
  * Система отслеживает UserPressKeysEvent и в случае подключенного клиента отправляет нажатые клавиши на сервер

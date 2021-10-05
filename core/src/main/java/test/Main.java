@@ -11,14 +11,14 @@ import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import test.assets.Assets;
+import test.client.GameClient;
+import test.client.messages.State;
 import test.game.Connection;
 import test.game.ecs.EcsWorldBuilder;
 import test.game.ecs.Game;
 import test.log.Log;
 import test.presentation.ConnectingScreen;
 import test.presentation.IScreen;
-import test.server.Server;
-import test.server.messages.State;
 
 public class Main extends ApplicationAdapter {
     public static float BLOCK_SIZE = 50;
@@ -28,7 +28,13 @@ public class Main extends ApplicationAdapter {
     private SpriteBatch batch;
     private Game game;
     private final Queue<State> states = new Queue<>(5);
-    private Server server;
+    private GameClient gameClient;
+    private final String host;
+    private final int port;
+    public Main(String host, int port){
+        this.host = host;
+        this.port = port;
+    }
 
     @Override
     public void create() {
@@ -58,7 +64,7 @@ public class Main extends ApplicationAdapter {
                             ;
                         });
 
-        server = new Server("127.0.0.1", 8080).connect(
+        gameClient = new GameClient(host, port).connect(
                 ctx->{
                     Log.i(this, "Connected!");
                     // и всё :)
@@ -81,7 +87,7 @@ public class Main extends ApplicationAdapter {
                         game = new Game(ecsWorldBuilder,states);
                         int playeId = game.createEntityForLocalPlayer();
                         remoteToLocalEntities.put(initialGD.remotePlayerId, playeId);
-                        game.onConnecting(playeId,new Connection(ctx));
+                        game.onConnecting(playeId,new Connection(ctx.channel()));
 
                         screen = game;
                     });
@@ -117,7 +123,7 @@ public class Main extends ApplicationAdapter {
     public void dispose() {
         Log.i(this,"dispose!");
 		screen.dispose();
-        server.dispose();
+        gameClient.dispose();
     }
 
     @Override

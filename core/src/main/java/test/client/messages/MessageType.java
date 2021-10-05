@@ -1,4 +1,4 @@
-package test.server.messages;
+package test.client.messages;
 
 /**
  * Содержит коды сообщений от сервера, для идентификации типа сообщения

@@ -1,4 +1,4 @@
-package test.server.messages;
+package test.client.messages;
 
 import com.google.gson.annotations.Expose;
 
